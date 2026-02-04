@@ -33,6 +33,7 @@
                         'slide-out': 'slideOut 0.5s ease-in forwards',
                         'scroll': 'scroll 20s linear infinite',
                         'shimmer': 'shimmer 3s linear infinite',
+                        'float': 'float 3s ease-in-out infinite',
                     },
                     keyframes: {
                         slideIn: {
@@ -50,6 +51,10 @@
                         shimmer: {
                             '0%': { backgroundPosition: '0% 50%' },
                             '100%': { backgroundPosition: '100% 50%' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
                         }
                     }
                 }
@@ -147,6 +152,27 @@
             border-radius: 24px;
             opacity: 0.5;
         }
+
+        /* ปุ่มกดที่มีแสงวิ่ง */
+        .glow-button {
+            position: relative;
+            overflow: hidden;
+        }
+        .glow-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            animation: reflect 3s infinite;
+        }
+        @keyframes reflect {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start p-4 text-white pb-24">
@@ -164,7 +190,7 @@
         <div class="text-center space-y-3">
             <div class="relative inline-block group cursor-pointer" onclick="celebrate()">
                 <div class="absolute inset-0 bg-gradient-to-tr from-tiktok to-tiktok_red rounded-full blur opacity-75 animate-pulse-slow"></div>
-                <div class="relative w-28 h-28 rounded-full bg-gradient-to-tr from-tiktok to-tiktok_red p-1 mx-auto shadow-2xl">
+                <div class="relative w-28 h-28 rounded-full bg-gradient-to-tr from-tiktok to-tiktok_red p-1 mx-auto shadow-2xl animate-float">
                     <div class="w-full h-full rounded-full bg-gray-900 flex items-center justify-center overflow-hidden relative">
                         <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Boss's Car Profile" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition duration-500">
                         <div class="absolute inset-0 flex items-center justify-center bg-black/20">
@@ -207,7 +233,10 @@
             </div>
             
             <div class="flex justify-between mt-4">
-                <p class="text-[10px] text-gray-500 italic">"ขอบคุณทุกบาททุกสตางค์ที่ช่วยให้โปรเจกต์นี้เดินต่อได้ครับ"</p>
+                <p class="text-[10px] text-gray-400 italic font-light">
+                    <i class="fa-solid fa-heart text-tiktok_red animate-pulse mr-1"></i>
+                    <span id="thank-you-msg">ขอบคุณทุกกำลังใจที่ร่วมสนับสนุนครับ</span>
+                </p>
                 <span id="goal-percent" class="text-[11px] font-black text-tiktok italic">0%</span>
             </div>
         </div>
@@ -255,13 +284,13 @@
             </div>
 
             <button onclick="copyToClipboard('1511453654')" 
-                class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 px-4 rounded-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center space-x-3">
+                class="glow-button w-full bg-gray-900 hover:bg-black text-white font-bold py-4 px-4 rounded-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center space-x-3">
                 <i class="fa-solid fa-check-double text-kbank"></i>
                 <span>คัดลอกเลขบัญชี</span>
             </button>
         </div>
 
-        <!-- QR TAB CONTENT (Updated with exact PromptPay string) -->
+        <!-- QR TAB CONTENT -->
         <div id="tab-qr" class="hidden bank-card rounded-3xl p-6 text-gray-800 relative overflow-hidden transition-all duration-300">
             <div class="text-center space-y-4">
                 <div class="flex flex-col items-center">
@@ -269,10 +298,8 @@
                         <img src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Thai_QR_Payment_Logo.svg" alt="Thai QR Payment" class="h-8 mx-auto">
                     </div>
                     
-                    <!-- ใช้ข้อมูล PromptPay String ที่คุณให้มา เพื่อสร้าง QR Code ที่ถูกต้องแม่นยำ -->
                     <div class="qr-frame max-w-[240px] group cursor-pointer active:scale-95 transition-transform" onclick="celebrate()">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=00020101021129390016A000000677010111031500477700030653953037645802TH63045FA1" alt="Official PromptPay QR Code" class="w-full h-auto rounded-xl">
-                        
                         <div class="absolute left-0 right-0 top-0 h-1 bg-tiktok/30 animate-bounce blur-sm"></div>
                     </div>
                     
@@ -309,8 +336,8 @@
     <!-- FAKE DONATION ALERTS -->
     <div id="fake-alert" class="hidden donation-alert glass-card rounded-2xl pl-2 pr-6 py-2.5 flex items-center space-x-4 shadow-2xl max-w-[300px] border-l-4 border-l-tiktok">
         <div class="relative">
-            <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700">
-                <i class="fa-solid fa-user-astronaut text-tiktok text-xl animate-bounce"></i>
+            <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 shadow-[0_0_15px_rgba(0,242,234,0.3)]">
+                <i id="alert-icon" class="fa-solid fa-car-side text-tiktok text-xl animate-bounce"></i>
             </div>
         </div>
         <div class="flex flex-col">
@@ -330,6 +357,22 @@
     <input type="text" value="1511453654" id="hidden-acc" class="fixed -top-full opacity-0">
 
     <script>
+        const thankYouPhrases = [
+            "ขอบคุณทุกกำลังใจที่ร่วมสนับสนุนครับ",
+            "เงินทุกบาทจะนำไปพัฒนาช่องให้ดีขึ้นครับ",
+            "ขอบคุณสหายสายซิ่งทุกคนมากครับ!",
+            "ดีใจที่มีคนรักรถเหมือนกันครับ ขอบคุณครับ",
+            "ร่วมสร้างฝันปั้นรถไปด้วยกัน ขอบคุณครับ"
+        ];
+
+        function updateThankYouMessage() {
+            const msgEl = document.getElementById('thank-you-msg');
+            if (msgEl) {
+                const randomMsg = thankYouPhrases[Math.floor(Math.random() * thankYouPhrases.length)];
+                msgEl.innerText = randomMsg;
+            }
+        }
+
         function initProgressBar() {
             const targetPercent = 70;
             const targetAmount = 3500;
@@ -365,11 +408,12 @@
 
         function celebrate() {
             confetti({
-                particleCount: 100,
+                particleCount: 150,
                 spread: 70,
                 origin: { y: 0.6 },
                 colors: ['#00f2ea', '#ff0050', '#138f2d', '#FF0000', '#00427a']
             });
+            updateThankYouMessage();
         }
 
         function switchTab(tabName) {
@@ -400,18 +444,24 @@
 
         const names = ['เฮียตี๋ สายหมอบ', 'บังรีฟ คลองสอง', 'เจ๊แอน รถซิ่ง', 'สหายคนเดิม', 'มด เอ็กซ์', 'Keng_Racer', 'คุณนัท ปากเกร็ด', 'Aum_Turbo', 'สิงห์นักขับ', 'P_Oat'];
         const amounts = [20, 50, 99, 100, 150, 300, 500, 1000];
+        const icons = ['fa-car-side', 'fa-fire', 'fa-bolt', 'fa-trophy', 'fa-rocket'];
 
         function showFakeAlert() {
             const alertBox = document.getElementById('fake-alert');
             const nameEl = document.getElementById('alert-name');
             const amountEl = document.getElementById('alert-amount');
+            const iconEl = document.getElementById('alert-icon');
             if (!alertBox || !nameEl || !amountEl) return;
             
             const randomName = names[Math.floor(Math.random() * names.length)];
             const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
 
             nameEl.innerText = randomName;
             amountEl.innerText = '฿' + randomAmount.toLocaleString();
+            
+            // เปลี่ยนไอคอนสุ่ม
+            iconEl.className = `fa-solid ${randomIcon} text-tiktok text-xl animate-bounce`;
 
             alertBox.classList.remove('hidden');
             alertBox.style.animation = 'slideIn 0.5s ease-out forwards';
@@ -428,7 +478,7 @@
                 showFakeAlert();
                 setInterval(() => {
                     if(Math.random() > 0.4) showFakeAlert();
-                }, 18000);
+                }, 15000);
             }, 4000);
         };
     </script>
