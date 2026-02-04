@@ -286,31 +286,39 @@
         <span>คัดลอกเลขบัญชีแล้ว รวยๆ ครับ!</span>
     </div>
 
-    <input type="text" id="hidden-copy" value="1511453654" class="absolute -top-96 opacity-0">
-
     <script>
-        // Start Engine Animation
-        function copyAction(text) {
-            const input = document.getElementById('hidden-copy');
-            input.select();
-            document.execCommand('copy');
-            
-            // Vibrate Effect
-            const card = document.getElementById('tab-bank');
-            const profile = document.getElementById('profile-container');
-            card.classList.add('engine-vibrate');
-            profile.classList.add('engine-vibrate');
-            
-            // Toast & Confetti
-            const toast = document.getElementById('toast');
-            toast.classList.remove('hidden');
-            celebrate();
-            
-            setTimeout(() => {
-                card.classList.remove('engine-vibrate');
-                profile.classList.remove('engine-vibrate');
-                toast.classList.add('hidden');
-            }, 2000);
+        // แก้ไขฟังก์ชันคัดลอกให้ทันสมัยขึ้น แป้นพิมพ์ไม่เด้งแน่นอน
+        async function copyAction(text) {
+            try {
+                // ใช้ Clipboard API โดยตรง
+                await navigator.clipboard.writeText(text);
+                
+                // เอฟเฟกต์สั่นสะเทือนแบบ Engine Start
+                const card = document.getElementById('tab-bank');
+                const profile = document.getElementById('profile-container');
+                card.classList.add('engine-vibrate');
+                profile.classList.add('engine-vibrate');
+                
+                // แสดง Toast และโปรยพลุ
+                const toast = document.getElementById('toast');
+                toast.classList.remove('hidden');
+                celebrate();
+                
+                setTimeout(() => {
+                    card.classList.remove('engine-vibrate');
+                    profile.classList.remove('engine-vibrate');
+                    toast.classList.add('hidden');
+                }, 2000);
+
+            } catch (err) {
+                // Fallback สำหรับเบราว์เซอร์เก่า
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
         }
 
         function celebrate() {
@@ -359,7 +367,6 @@
             }
         }
 
-        // Fake Alert System
         const fakeUsers = ['พี่แจ็ค นครปฐม', 'สหายคนเดิม', 'บังรีฟ คลองสาม', 'สายปั้นรถไทย', 'Keng_Garage', 'Aum_Turbo'];
         function triggerAlert() {
             const box = document.getElementById('alert-box');
@@ -373,14 +380,12 @@
             setTimeout(() => box.classList.add('hidden'), 5000);
         }
 
-        // Progress Animation
         function animateProgress() {
             const bar = document.getElementById('main-progress');
             const current = document.getElementById('goal-current');
             const percent = document.getElementById('goal-percent');
             
             let targetVal = 3500;
-            let targetPercent = 70;
             let curVal = 0;
             
             const timer = setInterval(() => {
