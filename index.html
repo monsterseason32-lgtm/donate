@@ -25,15 +25,17 @@
                         tiktok: '#00f2ea',
                         tiktok_red: '#ff0050',
                         youtube: '#FF0000',
-                        promptpay: '#00427a'
+                        promptpay: '#00427a',
+                        neon_gold: '#ffcc00'
                     },
                     animation: {
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'slide-in': 'slideIn 0.5s ease-out forwards',
                         'slide-out': 'slideOut 0.5s ease-in forwards',
-                        'scroll': 'scroll 20s linear infinite',
+                        'scroll': 'scroll 25s linear infinite',
                         'shimmer': 'shimmer 3s linear infinite',
                         'float': 'float 3s ease-in-out infinite',
+                        'vibrate': 'vibrate 0.2s linear infinite',
                     },
                     keyframes: {
                         slideIn: {
@@ -42,7 +44,7 @@
                         },
                         slideOut: {
                             '0%': { transform: 'translateX(0)', opacity: '1' },
-                            100: { transform: 'translateX(-120%)', opacity: '0' },
+                            '100%': { transform: 'translateX(-120%)', opacity: '0' },
                         },
                         scroll: {
                             '0%': { transform: 'translateX(100%)' },
@@ -55,6 +57,12 @@
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-10px)' },
+                        },
+                        vibrate: {
+                            '0%, 100%': { transform: 'translate(0)' },
+                            '25%': { transform: 'translate(-2px, 2px)' },
+                            '50%': { transform: 'translate(2px, -2px)' },
+                            '75%': { transform: 'translate(-2px, -2px)' },
                         }
                     }
                 }
@@ -64,422 +72,330 @@
     <style>
         body {
             font-family: 'Kanit', sans-serif;
-            background: linear-gradient(135deg, #111827 0%, #000000 100%);
+            background: radial-gradient(circle at top, #1e293b 0%, #000000 100%);
             overflow-x: hidden;
         }
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .bank-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-        }
-        .copy-success {
-            animation: fadeInOut 2s ease-in-out forwards;
-        }
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(20px); }
-            10% { opacity: 1; transform: translateY(0); }
-            80% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
+            background: linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%);
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
         }
         .donation-alert {
             position: fixed;
-            bottom: 85px;
+            top: 20px;
             left: 20px;
             z-index: 100;
         }
-        .marquee-container {
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-        }
-        
-        .progress-container {
-            position: relative;
-            background: rgba(31, 41, 55, 1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-        }
         .progress-bar-animated {
-            background: linear-gradient(
-                90deg, 
-                #00f2ea 0%, 
-                #ffffff 50%, 
-                #ff0050 100%
-            );
+            background: linear-gradient(90deg, #00f2ea, #ffffff, #ff0050);
             background-size: 200% 100%;
-            animation: shimmer 3s linear infinite;
-            position: relative;
-            transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: shimmer 2s linear infinite;
         }
-        .progress-bar-animated::after {
-            content: '';
+        .milestone-dot {
             position: absolute;
-            right: -2px;
             top: 50%;
-            transform: translateY(-50%);
-            width: 15px;
-            height: 15px;
-            background: #ffffff;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
             border-radius: 50%;
-            filter: blur(4px);
-            box-shadow: 0 0 15px #00f2ea, 0 0 30px #ff0050;
-            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 10px white;
+        }
+        .neon-border {
+            box-shadow: 0 0 15px rgba(0, 242, 234, 0.5), inset 0 0 5px rgba(0, 242, 234, 0.2);
+        }
+        .engine-vibrate {
+            animation: vibrate 0.1s linear infinite;
         }
         
-        .qr-frame {
-            background: white;
-            padding: 12px;
-            border-radius: 24px;
-            box-shadow: 0 0 25px rgba(0, 66, 122, 0.15);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .qr-frame::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border: 2px solid transparent;
-            background: linear-gradient(45deg, #00427a, #00f2ea) border-box;
-            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            border-radius: 24px;
-            opacity: 0.5;
-        }
-
-        /* ปุ่มกดที่มีแสงวิ่ง */
-        .glow-button {
-            position: relative;
-            overflow: hidden;
-        }
-        .glow-button::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: rotate(45deg);
-            animation: reflect 3s infinite;
-        }
-        @keyframes reflect {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-4 text-white pb-24">
+<body class="min-h-screen flex flex-col items-center justify-start p-4 text-white pb-32">
 
-    <div class="w-full max-w-md space-y-6 pt-4">
+    <!-- Global Layout Wrapper -->
+    <div class="w-full max-w-md space-y-6">
         
-        <!-- Top Marquee -->
-        <div class="glass-card rounded-lg py-2 marquee-container">
-            <div class="animate-scroll inline-block text-[11px] font-medium tracking-wide uppercase text-tiktok">
-                🔥 ขอบคุณผู้สนับสนุนล่าสุด: คุณวีระพล ฿100 • สหายสายซิ่ง ฿50 • พี่เอก ระยอง ฿200 • บังรีฟ ฿20 • น้องนัท ฿500 • ขอบคุณทุกกำลังใจครับ!
+        <!-- Animated Banner -->
+        <div class="glass-card rounded-full py-1 px-4 overflow-hidden relative">
+            <div class="animate-scroll whitespace-nowrap text-[10px] font-bold text-tiktok flex gap-8">
+                <span>🏁 ยินดีต้อนรับสู่โปรเจกต์แต่งรถของ Boss's Car</span>
+                <span>🔥 ขอบคุณผู้สนับสนุน: คุณเอ็ม ฿100, พี่บอย ฿500, บังรีฟ ฿50, น้องเนม ฿200</span>
+                <span>🚗 เป้าหมาย: ทำสีรอบคัน 70% แล้ว!</span>
             </div>
         </div>
 
-        <!-- Header Profile Section -->
-        <div class="text-center space-y-3">
-            <div class="relative inline-block group cursor-pointer" onclick="celebrate()">
-                <div class="absolute inset-0 bg-gradient-to-tr from-tiktok to-tiktok_red rounded-full blur opacity-75 animate-pulse-slow"></div>
-                <div class="relative w-28 h-28 rounded-full bg-gradient-to-tr from-tiktok to-tiktok_red p-1 mx-auto shadow-2xl animate-float">
-                    <div class="w-full h-full rounded-full bg-gray-900 flex items-center justify-center overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Boss's Car Profile" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition duration-500">
-                        <div class="absolute inset-0 flex items-center justify-center bg-black/20">
-                           <i class="fa-solid fa-car text-3xl text-white drop-shadow-lg group-active:scale-125 transition-transform"></i>
-                        </div>
+        <!-- Hero Section -->
+        <div class="text-center space-y-4 pt-4">
+            <div class="relative inline-block" id="profile-container">
+                <div class="absolute inset-0 bg-tiktok rounded-full blur-2xl opacity-20 animate-pulse"></div>
+                <div class="relative w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-tiktok via-white to-tiktok_red animate-float">
+                    <div class="w-full h-full rounded-full bg-black overflow-hidden border-2 border-black/50">
+                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=300&q=80" alt="Boss's Car" class="w-full h-full object-cover">
                     </div>
-                </div>
-                <div class="absolute -bottom-1 -right-1 bg-black text-white text-[10px] px-2 py-1 rounded-full border border-gray-700 flex items-center gap-1 shadow-lg">
-                    <i class="fa-solid fa-circle-check text-tiktok"></i>
-                    <span>ยืนยันตัวตน</span>
+                    <div class="absolute -bottom-2 -right-2 bg-tiktok text-black w-10 h-10 rounded-full flex items-center justify-center border-4 border-black shadow-xl">
+                        <i class="fa-solid fa-bolt text-lg"></i>
+                    </div>
                 </div>
             </div>
             
-            <div>
-                <h1 class="text-3xl font-bold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Boss's Car</h1>
-                <p class="text-gray-400 text-sm">แต่งรถ | รีวิว | ไลฟ์สไตล์ | TikToker & YouTuber</p>
+            <div class="space-y-1">
+                <h1 class="text-4xl font-black tracking-tighter italic uppercase">Boss's Car</h1>
+                <div class="flex justify-center items-center gap-2 text-xs text-gray-400 font-medium">
+                    <span class="flex items-center gap-1"><i class="fa-brands fa-tiktok text-tiktok"></i> 5K</span>
+                    <span class="w-1 h-1 bg-gray-600 rounded-full"></span>
+                    <span class="flex items-center gap-1"><i class="fa-brands fa-youtube text-youtube"></i> 100</span>
+                </div>
             </div>
         </div>
 
-        <!-- Donation Goal Section -->
-        <div class="glass-card rounded-2xl p-5 relative overflow-hidden border-tiktok/20 shadow-[0_0_20px_rgba(0,242,234,0.1)]">
-            <div class="flex justify-between items-end mb-3">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="relative flex h-2 w-2">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tiktok opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-2 w-2 bg-tiktok"></span>
-                        </span>
-                        <span class="text-[10px] text-tiktok uppercase font-bold tracking-widest">Live Campaign</span>
-                    </div>
-                    <h3 class="text-sm font-semibold">สมทบทุนทำสีรอบคัน 🚗✨</h3>
+        <!-- Mission Progress Card -->
+        <div class="glass-card rounded-[2.5rem] p-6 border-white/5 relative overflow-hidden">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="text-[10px] font-bold text-tiktok uppercase tracking-widest mb-1">Current Goal</p>
+                    <h2 class="text-xl font-bold italic">พ่นสีน้ำเงินแก้วรอบคัน 💎</h2>
                 </div>
                 <div class="text-right">
-                    <p class="text-lg font-bold text-white"><span id="goal-current">฿0</span> <span class="text-xs text-gray-500 font-normal">/ 5,000</span></p>
+                    <p class="text-2xl font-black italic text-white" id="goal-current">฿0</p>
+                    <p class="text-[10px] text-gray-500 uppercase">Target: ฿5,000</p>
                 </div>
             </div>
-            
-            <div class="w-full progress-container rounded-full h-4 overflow-visible">
-                <div id="main-progress" class="progress-bar-animated h-full rounded-full w-0"></div>
+
+            <div class="relative h-6 bg-black/40 rounded-full p-1 border border-white/5 mb-2">
+                <div id="main-progress" class="progress-bar-animated h-full rounded-full w-0 transition-all duration-1000"></div>
+                <!-- Milestones -->
+                <div class="milestone-dot" style="left: 60%;" title="ซื้อสี"></div>
+                <div class="milestone-dot" style="left: 80%;" title="ขัดผิว"></div>
             </div>
             
-            <div class="flex justify-between mt-4">
-                <p class="text-[10px] text-gray-400 italic font-light">
-                    <i class="fa-solid fa-heart text-tiktok_red animate-pulse mr-1"></i>
-                    <span id="thank-you-msg">ขอบคุณทุกกำลังใจที่ร่วมสนับสนุนครับ</span>
-                </p>
-                <span id="goal-percent" class="text-[11px] font-black text-tiktok italic">0%</span>
+            <div class="flex justify-between text-[10px] font-bold uppercase text-gray-500 italic">
+                <span>Start</span>
+                <span class="text-tiktok" id="goal-percent">0% Completed</span>
+                <span>Finish</span>
             </div>
         </div>
 
-        <!-- Tab Switcher -->
-        <div class="flex p-1.5 bg-gray-900/50 border border-gray-800 rounded-2xl">
-            <button onclick="switchTab('bank')" id="btn-bank" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-700 text-white shadow-lg transition-all">
-                <i class="fa-solid fa-building-columns mr-1.5"></i> เลขบัญชี
-            </button>
-            <button onclick="switchTab('qr')" id="btn-qr" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-white transition-all">
-                <i class="fa-solid fa-qrcode mr-1.5"></i> สแกน QR
-            </button>
-        </div>
+        <!-- Payment Tabs -->
+        <div class="space-y-4">
+            <div class="flex gap-2 p-1 bg-white/5 rounded-2xl border border-white/5">
+                <button onclick="switchTab('bank')" id="tab-btn-bank" class="flex-1 py-3 rounded-xl text-xs font-bold transition-all bg-white text-black shadow-xl">
+                    <i class="fa-solid fa-university mr-2"></i>เลขบัญชี
+                </button>
+                <button onclick="switchTab('qr')" id="tab-btn-qr" class="flex-1 py-3 rounded-xl text-xs font-bold transition-all text-gray-400">
+                    <i class="fa-solid fa-qrcode mr-2"></i>QR Code
+                </button>
+            </div>
 
-        <!-- BANK TAB CONTENT -->
-        <div id="tab-bank" class="bank-card rounded-3xl p-7 text-gray-800 relative overflow-hidden transition-all duration-300">
-            <div class="absolute -top-10 -right-10 w-40 h-40 bg-kbank/5 rounded-full blur-3xl"></div>
-            <div class="flex items-start justify-between mb-8">
-                <div class="flex items-center space-x-3">
-                    <div class="w-14 h-14 rounded-2xl bg-kbank flex items-center justify-center text-white text-2xl shadow-xl rotate-3">
-                        <i class="fa-solid fa-credit-card"></i>
+            <!-- Bank Info Area -->
+            <div id="tab-bank" class="bank-card rounded-[2.5rem] p-8 text-black relative group">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="bg-kbank p-3 rounded-2xl text-white shadow-lg rotate-[-5deg]">
+                        <i class="fa-solid fa-shield-cat text-2xl"></i>
                     </div>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Kasikornthai_Logo.svg" class="h-6">
+                </div>
+
+                <div class="space-y-6 text-center">
+                    <div class="cursor-pointer group/num" onclick="copyAction('1511453654')">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Savings Account</p>
+                        <div class="text-4xl font-black tracking-tighter font-mono group-hover/num:text-kbank transition-colors">151 145 3654</div>
+                        <p class="text-[9px] font-bold text-kbank mt-1 opacity-0 group-hover/num:opacity-100 transition-opacity">แตะเพื่อคัดลอก</p>
+                    </div>
+
                     <div>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">ธนาคาร</p>
-                        <h3 class="font-bold text-xl text-kbank leading-tight text-gray-800">กสิกรไทย</h3>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Account Holder</p>
+                        <h3 class="text-2xl font-bold">ภานุวัฒน์ คำขันย์</h3>
                     </div>
                 </div>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Kasikornthai_Logo.svg" alt="KBank" class="h-8 opacity-80">
+
+                <button onclick="copyAction('1511453654')" id="copy-btn" class="w-full mt-8 bg-black text-white py-5 rounded-2xl font-black uppercase italic tracking-widest text-sm hover:scale-[1.02] active:scale-95 transition-all shadow-2xl flex items-center justify-center gap-3 neon-border">
+                    <i class="fa-solid fa-gas-pump"></i>
+                    <span>คัดลอกแล้วไปลุย!</span>
+                </button>
             </div>
 
-            <div class="bg-gray-50 rounded-2xl p-5 mb-5 border border-gray-200 text-center relative group active:scale-95 transition-transform cursor-pointer" onclick="copyToClipboard('1511453654')">
-                <p class="text-[10px] text-gray-400 mb-1 font-bold uppercase text-center">Account Number</p>
-                <div class="flex justify-center items-center space-x-3">
-                    <span class="text-3xl font-bold tracking-tighter font-mono text-gray-800">1511453654</span>
-                    <div class="bg-kbank/10 p-2 rounded-lg">
-                        <i class="fa-regular fa-copy text-kbank"></i>
+            <!-- QR Area -->
+            <div id="tab-qr" class="hidden bank-card rounded-[2.5rem] p-8 text-black text-center">
+                <div class="mb-6">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/28/Thai_QR_Logo.svg" class="h-8 mx-auto mb-4">
+                    <div class="bg-white p-4 rounded-3xl shadow-inner inline-block relative group" onclick="celebrate()">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129390016A000000677010111031500477700030653953037645802TH63045FA1" class="w-48 h-48 rounded-xl">
+                        <div class="absolute inset-0 border-4 border-tiktok rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
                     </div>
                 </div>
-                <p class="text-[10px] text-kbank mt-2 opacity-0 group-hover:opacity-100 transition-opacity uppercase font-bold text-center">แตะเพื่อคัดลอก</p>
-            </div>
-
-            <div class="text-center mb-8">
-                <p class="text-[10px] text-gray-400 mb-1 font-bold uppercase">Account Name</p>
-                <h2 class="text-2xl font-bold text-gray-800">ภานุวัฒน์ คำขันย์</h2>
-            </div>
-
-            <button onclick="copyToClipboard('1511453654')" 
-                class="glow-button w-full bg-gray-900 hover:bg-black text-white font-bold py-4 px-4 rounded-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center space-x-3">
-                <i class="fa-solid fa-check-double text-kbank"></i>
-                <span>คัดลอกเลขบัญชี</span>
-            </button>
-        </div>
-
-        <!-- QR TAB CONTENT -->
-        <div id="tab-qr" class="hidden bank-card rounded-3xl p-6 text-gray-800 relative overflow-hidden transition-all duration-300">
-            <div class="text-center space-y-4">
-                <div class="flex flex-col items-center">
-                    <div class="mb-4">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Thai_QR_Payment_Logo.svg" alt="Thai QR Payment" class="h-8 mx-auto">
-                    </div>
-                    
-                    <div class="qr-frame max-w-[240px] group cursor-pointer active:scale-95 transition-transform" onclick="celebrate()">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=00020101021129390016A000000677010111031500477700030653953037645802TH63045FA1" alt="Official PromptPay QR Code" class="w-full h-auto rounded-xl">
-                        <div class="absolute left-0 right-0 top-0 h-1 bg-tiktok/30 animate-bounce blur-sm"></div>
-                    </div>
-                    
-                    <div class="mt-4 space-y-1">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ชื่อบัญชี</p>
-                        <p class="font-bold text-xl text-gray-800">นาย ภานุวัฒน์ คำขันย์</p>
-                        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-promptpay/10 text-promptpay rounded-full mt-2">
-                             <i class="fa-solid fa-shield-halved text-[10px]"></i>
-                             <span class="text-[11px] font-bold">PromptPay ปลอดภัย 100%</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <p class="text-[11px] text-gray-400 italic">"สแกนผ่านแอปธนาคารเพื่อสนับสนุนได้เลยครับ"</p>
+                <h3 class="text-xl font-bold">นาย ภานุวัฒน์ คำขันย์</h3>
+                <p class="text-[10px] text-gray-500 font-bold uppercase mt-1">PromptPay Verified</p>
             </div>
         </div>
 
-        <!-- Social Links Grid -->
-        <div class="grid grid-cols-2 gap-4">
-            <a href="https://www.tiktok.com/@bosscar.th" target="_blank" 
-               class="glass-card hover:border-tiktok/50 rounded-2xl p-4 flex flex-col items-center justify-center space-y-2 transition-all group">
-                <i class="fa-brands fa-tiktok text-tiktok text-2xl group-hover:scale-110 transition-transform"></i>
-                <span class="text-xs font-bold tracking-tight text-center">TikTok</span>
+        <!-- Hall of Fame (Top Donators) -->
+        <div class="glass-card rounded-3xl p-6">
+            <h4 class="text-[10px] font-bold text-neon_gold uppercase tracking-widest mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-crown text-neon_gold"></i> Top Supporter of the Month
+            </h4>
+            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-neon_gold to-yellow-600 flex items-center justify-center text-black font-black italic shadow-[0_0_15px_rgba(255,204,0,0.3)]">
+                    #1
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-bold">พี่เอ็ม สายซิ่ง</p>
+                    <p class="text-[10px] text-gray-500">Donated ฿2,500</p>
+                </div>
+                <div class="text-right">
+                    <i class="fa-solid fa-medal text-neon_gold text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="flex justify-center gap-6 pb-10">
+            <a href="https://www.tiktok.com/@bosscar.th" class="w-12 h-12 glass-card rounded-full flex items-center justify-center text-tiktok hover:scale-110 transition-all">
+                <i class="fa-brands fa-tiktok text-xl"></i>
             </a>
-            <a href="https://www.youtube.com/@bossscarth" target="_blank" 
-               class="glass-card hover:border-youtube/50 rounded-2xl p-4 flex flex-col items-center justify-center space-y-2 transition-all group">
-                <i class="fa-brands fa-youtube text-youtube text-2xl group-hover:scale-110 transition-transform"></i>
-                <span class="text-xs font-bold tracking-tight text-center">YouTube</span>
+            <a href="https://www.youtube.com/@bossscarth" class="w-12 h-12 glass-card rounded-full flex items-center justify-center text-youtube hover:scale-110 transition-all">
+                <i class="fa-brands fa-youtube text-xl"></i>
             </a>
-        </div>
-
-    </div>
-
-    <!-- FAKE DONATION ALERTS -->
-    <div id="fake-alert" class="hidden donation-alert glass-card rounded-2xl pl-2 pr-6 py-2.5 flex items-center space-x-4 shadow-2xl max-w-[300px] border-l-4 border-l-tiktok">
-        <div class="relative">
-            <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 shadow-[0_0_15px_rgba(0,242,234,0.3)]">
-                <i id="alert-icon" class="fa-solid fa-car-side text-tiktok text-xl animate-bounce"></i>
+            <div class="w-12 h-12 glass-card rounded-full flex items-center justify-center text-white cursor-pointer hover:scale-110 transition-all" onclick="celebrate()">
+                <i class="fa-solid fa-heart text-tiktok_red animate-pulse"></i>
             </div>
         </div>
-        <div class="flex flex-col">
-            <p class="text-[11px] leading-tight text-gray-400">คุณ <span id="alert-name" class="text-white font-bold">Userxxx</span></p>
-            <p class="text-sm font-black text-tiktok tracking-wide">ส่งกำลังใจ <span id="alert-amount">฿0.00</span></p>
+    </div>
+
+    <!-- Live Alerts -->
+    <div id="alert-box" class="hidden donation-alert glass-card rounded-2xl p-4 flex items-center gap-4 shadow-2xl border-l-4 border-tiktok animate-slide-in">
+        <div class="w-12 h-12 bg-tiktok/20 rounded-xl flex items-center justify-center text-tiktok">
+            <i class="fa-solid fa-car-on animate-bounce"></i>
+        </div>
+        <div>
+            <p class="text-[10px] font-bold text-gray-400">NEW SUPPORTER!</p>
+            <p class="text-sm font-bold"><span id="alert-user">User</span> <span class="text-tiktok">฿<span id="alert-amount">0</span></span></p>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed top-10 left-1/2 transform -translate-x-1/2 bg-white text-gray-900 px-6 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 z-[200] border border-gray-200">
-        <div class="bg-kbank rounded-full p-1.5">
-            <i class="fa-solid fa-check text-[10px] text-white"></i>
-        </div>
-        <span class="font-bold text-sm tracking-tight">คัดลอกเลขบัญชีแล้ว! ขอให้รวยๆ ครับ</span>
+    <!-- Copy Success Toast -->
+    <div id="toast" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 bg-kbank text-white px-8 py-4 rounded-2xl shadow-2xl font-bold flex items-center gap-3 z-[200]">
+        <i class="fa-solid fa-check-circle"></i>
+        <span>คัดลอกเลขบัญชีแล้ว รวยๆ ครับ!</span>
     </div>
 
-    <input type="text" value="1511453654" id="hidden-acc" class="fixed -top-full opacity-0">
+    <input type="text" id="hidden-copy" value="1511453654" class="absolute -top-96 opacity-0">
 
     <script>
-        const thankYouPhrases = [
-            "ขอบคุณทุกกำลังใจที่ร่วมสนับสนุนครับ",
-            "เงินทุกบาทจะนำไปพัฒนาช่องให้ดีขึ้นครับ",
-            "ขอบคุณสหายสายซิ่งทุกคนมากครับ!",
-            "ดีใจที่มีคนรักรถเหมือนกันครับ ขอบคุณครับ",
-            "ร่วมสร้างฝันปั้นรถไปด้วยกัน ขอบคุณครับ"
-        ];
-
-        function updateThankYouMessage() {
-            const msgEl = document.getElementById('thank-you-msg');
-            if (msgEl) {
-                const randomMsg = thankYouPhrases[Math.floor(Math.random() * thankYouPhrases.length)];
-                msgEl.innerText = randomMsg;
-            }
-        }
-
-        function initProgressBar() {
-            const targetPercent = 70;
-            const targetAmount = 3500;
-            const progressBar = document.getElementById('main-progress');
-            const percentLabel = document.getElementById('goal-percent');
-            const currentLabel = document.getElementById('goal-current');
+        // Start Engine Animation
+        function copyAction(text) {
+            const input = document.getElementById('hidden-copy');
+            input.select();
+            document.execCommand('copy');
+            
+            // Vibrate Effect
+            const card = document.getElementById('tab-bank');
+            const profile = document.getElementById('profile-container');
+            card.classList.add('engine-vibrate');
+            profile.classList.add('engine-vibrate');
+            
+            // Toast & Confetti
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            celebrate();
             
             setTimeout(() => {
-                if (progressBar) progressBar.style.width = targetPercent + '%';
-            }, 500);
-            
-            const duration = 1500;
-            const startTime = performance.now();
-            
-            function updateCounter(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeOutQuad = t => t * (2 - t);
-                const easedProgress = easeOutQuad(progress);
-                
-                const currentPercent = Math.floor(easedProgress * targetPercent);
-                const currentMoney = Math.floor(easedProgress * targetAmount);
-                
-                if (percentLabel) percentLabel.innerText = currentPercent + '%';
-                if (currentLabel) currentLabel.innerText = '฿' + currentMoney.toLocaleString();
-                
-                if (progress < 1) {
-                    requestAnimationFrame(updateCounter);
-                }
-            }
-            requestAnimationFrame(updateCounter);
+                card.classList.remove('engine-vibrate');
+                profile.classList.remove('engine-vibrate');
+                toast.classList.add('hidden');
+            }, 2000);
         }
 
         function celebrate() {
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#00f2ea', '#ff0050', '#138f2d', '#FF0000', '#00427a']
-            });
-            updateThankYouMessage();
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+              confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#00f2ea', '#ffffff']
+              });
+              confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#ff0050', '#ffffff']
+              });
+
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
         }
 
-        function switchTab(tabName) {
-            const btnBank = document.getElementById('btn-bank');
-            const btnQr = document.getElementById('btn-qr');
-            const tabBank = document.getElementById('tab-bank');
-            const tabQr = document.getElementById('tab-qr');
-            if (tabName === 'bank') {
-                btnBank.classList.add('bg-gray-700', 'text-white'); btnQr.classList.remove('bg-gray-700', 'text-white');
-                tabBank.classList.remove('hidden'); tabQr.classList.add('hidden');
+        function switchTab(tab) {
+            const bBtn = document.getElementById('tab-btn-bank');
+            const qBtn = document.getElementById('tab-btn-qr');
+            const bTab = document.getElementById('tab-bank');
+            const qTab = document.getElementById('tab-qr');
+            
+            if(tab === 'bank') {
+                bBtn.className = "flex-1 py-3 rounded-xl text-xs font-bold transition-all bg-white text-black shadow-xl";
+                qBtn.className = "flex-1 py-3 rounded-xl text-xs font-bold transition-all text-gray-400";
+                bTab.classList.remove('hidden');
+                qTab.classList.add('hidden');
             } else {
-                btnQr.classList.add('bg-gray-700', 'text-white'); btnBank.classList.remove('bg-gray-700', 'text-white');
-                tabQr.classList.remove('hidden'); tabBank.classList.add('hidden');
+                qBtn.className = "flex-1 py-3 rounded-xl text-xs font-bold transition-all bg-white text-black shadow-xl";
+                bBtn.className = "flex-1 py-3 rounded-xl text-xs font-bold transition-all text-gray-400";
+                qTab.classList.remove('hidden');
+                bTab.classList.add('hidden');
                 celebrate();
             }
         }
 
-        function copyToClipboard(text) {
-            const copyText = document.getElementById("hidden-acc");
-            copyText.select();
-            document.execCommand('copy');
-            const toast = document.getElementById('toast');
-            toast.classList.remove('hidden');
-            toast.classList.add('copy-success');
-            celebrate();
-            setTimeout(() => { toast.classList.add('hidden'); }, 2000);
+        // Fake Alert System
+        const fakeUsers = ['พี่แจ็ค นครปฐม', 'สหายคนเดิม', 'บังรีฟ คลองสาม', 'สายปั้นรถไทย', 'Keng_Garage', 'Aum_Turbo'];
+        function triggerAlert() {
+            const box = document.getElementById('alert-box');
+            const user = document.getElementById('alert-user');
+            const amount = document.getElementById('alert-amount');
+            
+            user.innerText = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
+            amount.innerText = [20, 50, 100, 300][Math.floor(Math.random() * 4)];
+            
+            box.classList.remove('hidden');
+            setTimeout(() => box.classList.add('hidden'), 5000);
         }
 
-        const names = ['เฮียตี๋ สายหมอบ', 'บังรีฟ คลองสอง', 'เจ๊แอน รถซิ่ง', 'สหายคนเดิม', 'มด เอ็กซ์', 'Keng_Racer', 'คุณนัท ปากเกร็ด', 'Aum_Turbo', 'สิงห์นักขับ', 'P_Oat'];
-        const amounts = [20, 50, 99, 100, 150, 300, 500, 1000];
-        const icons = ['fa-car-side', 'fa-fire', 'fa-bolt', 'fa-trophy', 'fa-rocket'];
-
-        function showFakeAlert() {
-            const alertBox = document.getElementById('fake-alert');
-            const nameEl = document.getElementById('alert-name');
-            const amountEl = document.getElementById('alert-amount');
-            const iconEl = document.getElementById('alert-icon');
-            if (!alertBox || !nameEl || !amountEl) return;
+        // Progress Animation
+        function animateProgress() {
+            const bar = document.getElementById('main-progress');
+            const current = document.getElementById('goal-current');
+            const percent = document.getElementById('goal-percent');
             
-            const randomName = names[Math.floor(Math.random() * names.length)];
-            const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
-            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
-
-            nameEl.innerText = randomName;
-            amountEl.innerText = '฿' + randomAmount.toLocaleString();
+            let targetVal = 3500;
+            let targetPercent = 70;
+            let curVal = 0;
             
-            // เปลี่ยนไอคอนสุ่ม
-            iconEl.className = `fa-solid ${randomIcon} text-tiktok text-xl animate-bounce`;
-
-            alertBox.classList.remove('hidden');
-            alertBox.style.animation = 'slideIn 0.5s ease-out forwards';
-
-            setTimeout(() => {
-                alertBox.style.animation = 'slideOut 0.5s ease-in forwards';
-                setTimeout(() => { alertBox.classList.add('hidden'); }, 500);
-            }, 4500);
+            const timer = setInterval(() => {
+                if(curVal >= targetVal) clearInterval(timer);
+                curVal += 50;
+                current.innerText = '฿' + Math.min(curVal, targetVal).toLocaleString();
+                percent.innerText = Math.floor((curVal/5000)*100) + '% Completed';
+                bar.style.width = Math.floor((curVal/5000)*100) + '%';
+            }, 20);
         }
 
         window.onload = () => {
-            initProgressBar();
-            setTimeout(() => {
-                showFakeAlert();
-                setInterval(() => {
-                    if(Math.random() > 0.4) showFakeAlert();
-                }, 15000);
-            }, 4000);
+            animateProgress();
+            setTimeout(triggerAlert, 5000);
+            setInterval(() => { if(Math.random() > 0.7) triggerAlert(); }, 15000);
         };
     </script>
 </body>
