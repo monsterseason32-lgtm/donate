@@ -169,18 +169,26 @@
                 </div>
             </div>
 
-            <div class="relative h-6 bg-black/40 rounded-full p-1 border border-white/5 mb-2">
+            <div class="relative h-6 bg-black/40 rounded-full p-1 border border-white/5 mb-4">
                 <div id="main-progress" class="progress-bar-animated h-full rounded-full w-0 transition-all duration-1000"></div>
                 <!-- Milestones -->
                 <div class="milestone-dot" style="left: 60%;" title="ซื้อสี"></div>
                 <div class="milestone-dot" style="left: 80%;" title="ขัดผิว"></div>
             </div>
             
-            <div class="flex justify-between text-[10px] font-bold uppercase text-gray-500 italic">
+            <div class="flex justify-between text-[10px] font-bold uppercase text-gray-500 italic mb-6">
                 <span>Start</span>
                 <span class="text-tiktok" id="goal-percent">0% Completed</span>
                 <span>Finish</span>
             </div>
+
+            <!-- New: Schedule Link Button -->
+            <a href="https://monsterseason32-lgtm.github.io/schedule/" target="_blank" class="block w-full bg-white/10 hover:bg-tiktok hover:text-black py-4 rounded-2xl text-center transition-all duration-300 group border border-white/10">
+                <span class="text-sm font-bold uppercase italic tracking-widest flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-calendar-check text-tiktok group-hover:text-black"></i>
+                    ดูคิวซ่อมรถที่นี่
+                </span>
+            </a>
         </div>
 
         <!-- Payment Tabs -->
@@ -287,19 +295,15 @@
     </div>
 
     <script>
-        // แก้ไขฟังก์ชันคัดลอกให้ทันสมัยขึ้น แป้นพิมพ์ไม่เด้งแน่นอน
         async function copyAction(text) {
             try {
-                // ใช้ Clipboard API โดยตรง
                 await navigator.clipboard.writeText(text);
                 
-                // เอฟเฟกต์สั่นสะเทือนแบบ Engine Start
                 const card = document.getElementById('tab-bank');
                 const profile = document.getElementById('profile-container');
                 card.classList.add('engine-vibrate');
                 profile.classList.add('engine-vibrate');
                 
-                // แสดง Toast และโปรยพลุ
                 const toast = document.getElementById('toast');
                 toast.classList.remove('hidden');
                 celebrate();
@@ -311,7 +315,6 @@
                 }, 2000);
 
             } catch (err) {
-                // Fallback สำหรับเบราว์เซอร์เก่า
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
                 document.body.appendChild(textArea);
